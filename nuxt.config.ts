@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  runtimeConfig: {
+    poeApiKey: process.env.POE_API_KEY || '',
+  },
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
   devServer: {

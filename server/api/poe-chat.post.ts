@@ -14,7 +14,8 @@ export default defineEventHandler(async (event) => {
   const allowedModels = ["gpt-5.2", "gemini-3-flash", "gpt-5.2-instant"];
   const model = allowedModels.includes(model_name) ? model_name : "gpt-5.2-instant";
 
-  const poeApiKey = process.env.POE_API_KEY || "";
+  const config = useRuntimeConfig();
+  const poeApiKey = config.poeApiKey;
 
   const client = new OpenAI({
     apiKey: poeApiKey,
