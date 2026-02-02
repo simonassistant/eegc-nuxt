@@ -52,8 +52,6 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
-
 const props = defineProps({
   currentMode: { type: String, required: true },
   isThinking: { type: Boolean, required: true },

@@ -314,8 +314,6 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-
 const rubric1Open = ref(false);
 const rubric2Open = ref(false);
 </script>

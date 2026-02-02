@@ -254,7 +254,6 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onMounted } from "vue";
 import MarkdownIt from "markdown-it";
 
 const props = defineProps({

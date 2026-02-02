@@ -183,7 +183,6 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
 import { jsPDF } from "jspdf";
 import MarkdownIt from "markdown-it";
 import studentSectionMap from "~/components/eegc/student_section_map.json";

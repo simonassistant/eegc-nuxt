@@ -53,7 +53,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
 import Swal from "sweetalert2";
 
 const props = defineProps({

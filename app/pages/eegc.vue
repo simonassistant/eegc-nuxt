@@ -108,11 +108,7 @@
 <script setup>
 import Swal from 'sweetalert2'
 import { MODE_COLORS, MODE_LABELS } from '~/constants/eegcModes'
-import { Rubric, Sample_Essay } from '~/composables/eegc/promptAndEssay'
-import { useNotification } from '~/composables/eegc/useNotification'
-import { useApiConnection } from '~/composables/eegc/useApiConnection'
-import { useModeManager } from '~/composables/eegc/useModeManager'
-import { useReportGenerator } from '~/composables/eegc/useReportGenerator'
+
 
 /* ------------ Core State ------------ */
 const model = ref('gpt-5.2-instant')

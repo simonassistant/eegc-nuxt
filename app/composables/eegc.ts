@@ -1,2 +1,6 @@
 export * from './eegc/useChatFunctions'
 export * from './eegc/promptAndEssay'
+export * from './eegc/useNotification'
+export * from './eegc/useApiConnection'
+export * from './eegc/useModeManager'
+export * from './eegc/useReportGenerator'
