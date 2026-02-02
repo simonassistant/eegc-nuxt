@@ -49,7 +49,7 @@
       </div>
       <!-- User Input Section -->
       <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
-        <h3 class="text-md font-semibold mb-3 text-gray-700">📧 Email Settings</h3>
+        <h3 class="text-md font-semibold mb-3 text-gray-700">📋 Student Information</h3>
         <div class="space-y-3">
           <div>
             <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-1">
@@ -78,11 +78,11 @@
             />
           </div>
           <div>
-            <label for="studentNumber" class="block text-sm font-medium text-gray-700 mb-1">
+            <label for="confirmStudentNumber" class="block text-sm font-medium text-gray-700 mb-1">
               Confirm Student Number:
             </label>
             <input
-              id="studentNumber"
+              id="confirmStudentNumber"
               v-model="confirm_student_number"
               type="text"
               placeholder="Enter your student number"
@@ -113,11 +113,12 @@
       <div class="mt-6 flex flex-wrap justify-end gap-1" v-if="!generatingAnalysis">
         <button
           class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
-          @click="sendReportByEmail"
-          :disabled="emailSending || !isValidEmail(student_email) || emailSent"
+          @click="submitReport"
+          :disabled="submitting || submitted"
         >
-          <span v-if="emailSending">⏳ Sending...</span>
-          <span v-else>📧 Send Report</span>
+          <span v-if="submitting">⏳ Submitting...</span>
+          <span v-else-if="submitted">✅ Submitted</span>
+          <span v-else>🚀 Submit Report</span>
         </button>
         <button
           class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
@@ -187,7 +188,6 @@ import { jsPDF } from "jspdf";
 import MarkdownIt from "markdown-it";
 import studentSectionMap from "~/components/eegc/student_section_map.json";
 import sectionInfoMap from "~/components/eegc/section_info_map.json";
-import { BASE_URL } from "~/components/eegc/base_url";
 import Swal from "sweetalert2";
 
 const markdown = new MarkdownIt({
@@ -441,10 +441,10 @@ async function copyReport() {
 }
 
 const student_email = ref("@life.hkbu.edu.hk");
-const emailSending = ref(false);
-const emailSent = ref(false);
+const submitting = ref(false);
+const submitted = ref(false);
 
-async function sendReportByEmail() {
+async function submitReport() {
   const history = props.chatHistory;
 
   if (!history.length) {
@@ -461,39 +461,34 @@ async function sendReportByEmail() {
     alert("Please enter a valid email address");
     return;
   }
-  const baseReport = props.hiddenReport?.trim() || "[No hidden report provided]";
-  const feedbackRating = `\n🌟 **Rating:** ${rating.value}/5`;
-  const feedbackComment = `\n💬 **Comment:** ${
-    comment.value?.trim() || "No additional comment provided."
-  }`;
-  const combined_feedback = `${baseReport}\n\n---\n### 
-  🧑‍🎓 Student Feedback${feedbackRating}${feedbackComment}\n 
-  Current Mode:${props.mode}`;
-  emailSending.value = true;
-  const ccEmailList = [...(props.ccEmail || []), teacher_email.value];
+
+  submitting.value = true;
 
   try {
-    const response = await fetch(`${BASE_URL}/sendEmail/send-email`, {
+    const response = await fetch("/api/submit-report", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        student_email: student_email.value,
-        bccEmail: props.bccEmail,
-        ccEmail: ccEmailList,
-        report_history: history,
-        hiddenReport: combined_feedback,
-        report_info: props.reprotInfo,
-        contributionAnalysis: contributionAnalysis.value,
         student_number: student_number.value,
+        student_email: student_email.value,
         section_number: section_number.value,
+        rating: rating.value,
+        comment: comment.value,
+        mode: props.mode,
+        teacher_name: teacher_name.value,
+        chat_history: history,
+        contribution_analysis: contributionAnalysis.value,
+        hidden_report: props.hiddenReport,
+        report_info: props.reprotInfo,
       }),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to send email");
+      const errorData = await response.json();
+      throw new Error(errorData.statusMessage || "Failed to submit report");
     }
 
-    emailSent.value = true;
+    submitted.value = true;
     emit("submit");
     await Swal.fire({
       icon: "success",
@@ -502,9 +497,10 @@ async function sendReportByEmail() {
       confirmButtonText: "OK",
     });
   } catch (error) {
+    console.error("Submission error:", error);
     alert(`Error: ${error.message}`);
   } finally {
-    emailSending.value = false;
+    submitting.value = false;
   }
 }
 
