@@ -7,16 +7,12 @@ export default defineNuxtConfig({
     supabaseKey: process.env.SUPABASE_PUBLISHABLE_KEY || '',
   },
   devtools: { enabled: true },
+
+  // 添加这一行，让 Nuxt 知道你在使用这个模块
   modules: ['@nuxtjs/tailwindcss'],
-  devServer: {
-    port: 5000,
-    host: '0.0.0.0'
-  },
-  vite: {
-    server: {
-      hmr: {
-        clientPort: 443
-      }
-    }
+
+  // 现在编辑器就能识别这个属性了
+  tailwindcss: {
+    viewer: false
   }
 })

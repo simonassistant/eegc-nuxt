@@ -1,4 +1,17 @@
 import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+import MarkdownIt from "markdown-it";
+
+// Ensure html2canvas is available globally for jsPDF
+if (typeof window !== "undefined") {
+  window.html2canvas = html2canvas;
+}
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
 
 export function createMarkdownReport(history, contributionAnalysis) {
   const now = new Date();
@@ -33,89 +46,119 @@ ${msg.content}
   return markdown;
 }
 
-export function downloadPDF(history, contributionAnalysis) {
+export async function downloadPDF(history, contributionAnalysis) {
   if (!history.length) {
     alert("No conversation to export");
     return;
   }
 
-  const doc = new jsPDF();
-  let yPos = 20;
-
-  doc.setFontSize(18);
-  doc.text("HKBU Learning Session Report", 20, yPos);
-  yPos += 15;
-
   const now = new Date();
-
-  doc.setFontSize(12);
-  doc.text(`Generated: ${now.toLocaleString()}`, 20, yPos);
-  yPos += 7;
-  doc.text(`Total Messages: ${history.length}`, 20, yPos);
-  yPos += 15;
-
-  doc.setFontSize(14);
-  doc.text("Your Contribution Analysis", 20, yPos);
-  yPos += 7;
-  doc.setFontSize(11);
-  const analysisLines = doc.splitTextToSize(contributionAnalysis, 170);
-  analysisLines.forEach((line) => {
-    if (yPos > 270) {
-      doc.addPage();
-      yPos = 20;
-    }
-    doc.text(line, 20, yPos);
-    yPos += 6;
-  });
-  yPos += 10;
-
-  doc.setFontSize(14);
-  doc.text("Complete Conversation", 20, yPos);
-  yPos += 10;
-
-  doc.setFontSize(11);
+  const analysisHtml = contributionAnalysis ? md.render(contributionAnalysis) : "<p>No analysis available.</p>";
+  
+  let conversationHtml = "";
   history.forEach((msg) => {
-    if (yPos > 270) {
-      doc.addPage();
-      yPos = 20;
-    }
+    const role = msg.role === "user" ? "You" : "Assistant";
+    const time = msg.timestamp instanceof Date ? msg.timestamp.toLocaleString() : new Date(msg.timestamp).toLocaleString();
+    const contentHtml = md.render(msg.content || "");
+    
+    conversationHtml += `
+      <div class="message ${msg.role}" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+        <div class="message-header" style="margin-bottom: 5px; font-size: 13px;">
+          <strong>${role}</strong> <span class="timestamp" style="color: #888; margin-left: 10px;">${time}</span>
+        </div>
+        <div class="message-content" style="font-size: 14px;">${contentHtml}</div>
+      </div>
+    `;
+  });
 
-    const role = msg.role === "user" ? "You:" : "Assistant:";
-    doc.setFont(undefined, "bold");
-    doc.text(role, 20, yPos);
-    doc.setFont(undefined, "normal");
-    yPos += 6;
+  const htmlContent = `
+    <div id="pdf-content" style="padding: 40px; font-family: Arial, sans-serif; color: #333; line-height: 1.5; width: 700px; background: white;">
+      <h1 style="color: #004085; border-bottom: 2px solid #004085; padding-bottom: 10px; margin-top: 0;">HKBU Learning Session Report</h1>
+      
+      <div class="meta" style="margin-bottom: 20px; color: #666; font-size: 12px;">
+        <p style="margin: 5px 0;">Generated: ${now.toLocaleString()}</p>
+        <p style="margin: 5px 0;">Total Messages: ${history.length}</p>
+      </div>
 
-    const lines = doc.splitTextToSize(msg.content, 170);
-    lines.forEach((line) => {
-      if (yPos > 270) {
-        doc.addPage();
-        yPos = 20;
-      }
-      doc.text(line, 20, yPos);
-      yPos += 6;
+      <div class="section">
+        <h2 style="color: #004085; font-size: 18px; margin-top: 30px; margin-bottom: 10px;">Your Contribution Analysis</h2>
+        <div class="analysis-content" style="background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #004085;">
+          ${analysisHtml}
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 style="color: #004085; font-size: 18px; margin-top: 30px; margin-bottom: 10px;">Complete Conversation</h2>
+        <div class="conversation-history">
+          ${conversationHtml}
+        </div>
+      </div>
+
+      <div class="footer" style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 11px; color: #666;">
+        <p style="margin: 5px 0;"><strong>Created by:</strong> Dr. Simon Wang, Innovation Officer</p>
+        <p style="margin: 5px 0;">Language Centre, Hong Kong Baptist University</p>
+        <p style="margin: 5px 0;">simonwang@hkbu.edu.hk</p>
+      </div>
+    </div>
+  `;
+
+  // Create a temporary container to render HTML
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.left = "-10000px";
+  container.style.top = "0";
+  container.style.zIndex = "-9999";
+  container.innerHTML = htmlContent;
+  document.body.appendChild(container);
+
+  try {
+    // Wait for DOM to render
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const target = container.querySelector('#pdf-content');
+
+    // Capture the content
+    const canvas = await html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
     });
 
-    const time = msg.timestamp instanceof Date ? msg.timestamp.toLocaleTimeString() : new Date(msg.timestamp).toLocaleTimeString();
-    doc.setFontSize(9);
-    doc.text(time, 20, yPos);
-    doc.setFontSize(11);
-    yPos += 10;
-  });
+    // Calculate dimensions for PDF
+    const imgWidth = 595.28; // A4 width in points
+    const pageHeight = 841.89; // A4 height in points
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
 
-  if (yPos > 250) {
-    doc.addPage();
-    yPos = 20;
+    // Create PDF
+    const doc = new jsPDF('p', 'pt', 'a4');
+    const imgData = canvas.toDataURL('image/png');
+
+    // Add first page
+    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    // Add additional pages if content is longer than one page
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      doc.addPage();
+      doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+    
+    doc.save(`HKBU_Learning_Report_${new Date().toISOString().split("T")[0]}.pdf`);
+
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    alert("Failed to generate PDF. Please try again.");
+  } finally {
+    if (document.body.contains(container)) {
+      document.body.removeChild(container);
+    }
   }
-  yPos += 10;
-  doc.setFontSize(10);
-  doc.text("Created by: Dr. Simon Wang, Innovation Officer", 20, yPos);
-  yPos += 5;
-  doc.text("Language Centre, Hong Kong Baptist University", 20, yPos);
-  yPos += 5;
-  doc.text("simonwang@hkbu.edu.hk", 20, yPos);
-
-  doc.save(`HKBU_Learning_Report_${new Date().toISOString().split("T")[0]}.pdf`);
 }
 
 export function downloadMarkdownFile(reportText) {

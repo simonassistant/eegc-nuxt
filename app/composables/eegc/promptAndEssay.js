@@ -1,8 +1,8 @@
 export const Sample_Essay = `Climate change is a very serious problem in the world today, and many people argue that the actions of individuals do not matter much compared to what governments and big companies can do. I partly agree with this idea because I believe citizens can still influence the government, which is very important, but at the same time, I also think that personal green lifestyle choices, while less impactful, still have a role to play.
 
-The most important way individuals can help fight climate change is by influencing the government and politicians. When many citizens demand better environmental laws, governments are more likely to act. For example, if people protest or vote for leaders who care about the environment, it can push the government to ban pollution or invest in clean energy. In some countries, people have joined together and forced their leaders to make new rules about plastic or cutting carbon emiss ...[Truncated]
+The most important way individuals can help fight climate change is by influencing the government and politicians. When many citizens demand better environmental laws, governments are more likely to act. For example, if people protest or vote for leaders who care about the environment, it can push the government to ban pollution or invest in clean energy. In some countries, people have joined together and forced their leaders to make new rules about plastic or cutting carbon emissions. This shows that public opinion and pressure from normal people can have a big effect, even if individuals alone do not have much power. But sometimes, the government maybe just listen a little and not really make strong action, so is not always working well. Also, sometimes people want change but they don’t know how to tell the politicians, so nothing happen.
 
-On the other hand, individuals can also make small changes in their own lives, like recycling, using less water, or choosing to walk instead of drive. These actions are not as powerful as government policies, but they still matter. If many people try to live in a greener way, it can create a good example for others and send a message to companies that customers want eco-friendly products. For instance, if lots of people buy from green companies, businesses will try to be more sust ...[Truncated]
+On the other hand, individuals can also make small changes in their own lives, like recycling, using less water, or choosing to walk instead of drive. These actions are not as powerful as government policies, but they still matter. If many people try to live in a greener way, it can create a good example for others and send a message to companies that customers want eco-friendly products. For instance, if lots of people buy from green companies, businesses will try to be more sustainable to make more profit. But also, sometimes people don’t care and just want to do what is easy, so this is problem. Or maybe only a few people do green things but most people don’t change, so it not really enough to help the climate problem.
 
 In conclusion, while individual actions alone may not solve climate change, they are not completely useless. The most important thing is that citizens can influence governments to make strong decisions for the environment. At the same time, personal green habits can also help, even if they are less effective. In my opinion, everyone—governments, companies, and individuals—needs to work together to fight this problem.`
 
@@ -307,7 +307,7 @@ My role is to guide you with questions, feedback, and examples—but you'll alwa
 
 export const BulletPoints_Generation_Prompt = "Extract clear and concise 2 bullet points summarizing the latest four conversations, and return the result in Markdown. The bullet points should be revelant to essay improvement. Each bulle point should be one short sentence.\n\n"
 
-export const Rubric=`
+export const Rubric = `
 Assessment Task: Writing (20%)
 Part 1: Point-of-view Essay (10%)
 
