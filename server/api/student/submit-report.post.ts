@@ -1,8 +1,30 @@
 import { createClient } from '@supabase/supabase-js'
+import jwt from 'jsonwebtoken'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
+
+  // Extract student info from JWT
+  const token = getCookie(event, 'student_auth')
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized: Student login required',
+    })
+  }
+
+  let decoded: any
+  try {
+    decoded = jwt.verify(token, config.jwtSecret)
+  } catch (err) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Invalid or expired token',
+    })
+  }
+
+  const { student_number_suffix, name_prefix, section_number } = decoded
 
   const supabase = createClient(config.supabaseUrl, config.supabaseKey)
 
@@ -10,13 +32,12 @@ export default defineEventHandler(async (event) => {
     .from('learning_reports')
     .insert([
       {
-        student_number: body.student_number,
-        student_email: body.student_email,
-        section_number: body.section_number ? parseInt(body.section_number) : null,
+        student_number_suffix: student_number_suffix,
+        student_name_prefix: name_prefix,
+        section_number: section_number ? parseInt(section_number) : null,
         rating: body.rating,
         comment: body.comment,
         mode: body.mode,
-        teacher_name: body.teacher_name,
         chat_history: body.chat_history,
         contribution_analysis: { content: body.contribution_analysis },
         metadata: {

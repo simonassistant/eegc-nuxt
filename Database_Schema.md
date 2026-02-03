@@ -1,7 +1,7 @@
 create table public.learning_reports (
   id uuid not null default gen_random_uuid (),
   created_at timestamp with time zone not null default now(),
-  student_number_suffic text null,
+  student_number_suffix text null,
   student_name_prefix text null,
   section_number integer null,
   rating smallint null,

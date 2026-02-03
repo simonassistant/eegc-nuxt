@@ -10,47 +10,23 @@
       </div>
 
       <!-- Feedback Section -->
-      <ReportFeedback
-        v-if="props.mode === 'assessment'"
-        :mode="props.mode"
-        v-model:rating="rating"
-        v-model:comment="comment"
-      />
+      <ReportFeedback v-if="props.mode === 'assessment'" :mode="props.mode" v-model:rating="rating"
+        v-model:comment="comment" />
 
-      <!-- Student Information Section -->
-      <ReportStudentInfo
-        v-model:studentEmail="student_email"
-        v-model:studentNumber="student_number"
-        v-model:confirmStudentNumber="confirm_student_number"
-        v-model:sectionNumber="section_number"
-        :teacherName="teacher_name"
-        :teacherEmail="teacher_email"
-      />
 
       <!-- Actions Section -->
-      <ReportActions
-        :generatingAnalysis="generatingAnalysis"
-        :submitting="submitting"
-        :submitted="submitted"
-        @submit="submitReport"
-        @downloadPDF="handleDownloadPDF"
-        @downloadMarkdown="handleDownloadMarkdown"
-        @copyReport="handleCopyReport"
-        @close="$emit('close')"
-      />
+      <ReportActions :generatingAnalysis="generatingAnalysis" :submitting="submitting" :submitted="submitted"
+        @submit="submitReport" @downloadPDF="handleDownloadPDF" @downloadMarkdown="handleDownloadMarkdown"
+        @copyReport="handleCopyReport" @close="$emit('close')" />
 
       <p><strong>Total Messages:</strong> {{ props.chatHistory.length }}</p>
       <h3>📈 Your Contribution Analysis</h3>
       <div
         class="prose prose-sm max-w-none break-words [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_code]:whitespace-pre-wrap [&_ol]:list-decimal [&_ol]:ml-6 [&_ul]:list-disc"
-        v-html="renderMarkdown(contributionAnalysis)"
-      />
+        v-html="renderMarkdown(contributionAnalysis)" />
 
       <h3>📝 Complete Conversation</h3>
-      <ReportChatHistory
-        :chatHistory="chatHistory"
-        :renderMarkdown="renderMarkdown"
-      />
+      <ReportChatHistory :chatHistory="chatHistory" :renderMarkdown="renderMarkdown" />
 
       <div class="text-sm text-gray-500 mt-4">Generated: {{ timestamp }}</div>
     </div>
@@ -59,12 +35,9 @@
 
 <script setup>
 import MarkdownIt from "markdown-it";
-import studentSectionMap from "~/components/eegc/student_section_map.json";
-import sectionInfoMap from "~/components/eegc/section_info_map.json";
 import Swal from "sweetalert2";
 
 import ReportFeedback from "./report/ReportFeedback.vue";
-import ReportStudentInfo from "./report/ReportStudentInfo.vue";
 import ReportActions from "./report/ReportActions.vue";
 import ReportChatHistory from "./report/ReportChatHistory.vue";
 import {
@@ -108,31 +81,13 @@ const props = defineProps({
 });
 
 const timestamp = ref("");
-const student_number = ref("");
-const confirm_student_number = ref("");
-const section_number = ref("");
 const contributionAnalysis = ref("[Analyzing contribution...]");
 const generatingAnalysis = ref(true);
-const teacher_name = ref("");
-const teacher_email = ref("");
 const rating = ref(0);
 const comment = ref("");
-const student_email = ref("@life.hkbu.edu.hk");
 const submitting = ref(false);
 const submitted = ref(false);
 
-watch(student_number, (newVal) => {
-  if (newVal && studentSectionMap[newVal]) {
-    const secNum = studentSectionMap[newVal];
-    section_number.value = secNum;
-    teacher_name.value = sectionInfoMap[secNum].teacher;
-    teacher_email.value = sectionInfoMap[secNum].email;
-  } else {
-    section_number.value = "";
-    teacher_name.value = "No Teacher Found";
-    teacher_email.value = "Please Check Your Student Number";
-  }
-});
 
 watch(
   () => props.show,
@@ -210,15 +165,6 @@ async function submitReport() {
     return;
   }
 
-  if (student_number.value !== confirm_student_number.value) {
-    alert("Student number does not match!");
-    return;
-  }
-
-  if (!isValidEmail(student_email.value)) {
-    alert("Please enter a valid email address");
-    return;
-  }
 
   submitting.value = true;
 
@@ -227,13 +173,9 @@ async function submitReport() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        student_number: student_number.value,
-        student_email: student_email.value,
-        section_number: section_number.value,
         rating: rating.value,
         comment: comment.value,
         mode: props.mode,
-        teacher_name: teacher_name.value,
         chat_history: history,
         contribution_analysis: contributionAnalysis.value,
         hidden_report: props.hiddenReport,
