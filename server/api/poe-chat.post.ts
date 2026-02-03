@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const allowedModels = ["gpt-5.2", "gemini-3-flash", "gpt-5.2-instant"];
-  const model = allowedModels.includes(model_name) ? model_name : "gpt-5.2-instant";
+  const model = allowedModels.includes(model_name) ? model_name : "gemini-3-flash";
 
   const config = useRuntimeConfig();
   const poeApiKey = config.poeApiKey;

@@ -121,7 +121,7 @@ async function analyzeContribution(userMessages, props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_history,
-        model_name: "gpt-5.2-instant",
+        model_name: "gemini-3-flash",
         stream: false,
       }),
     });

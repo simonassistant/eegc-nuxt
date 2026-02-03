@@ -69,7 +69,7 @@ import { MODE_COLORS, MODE_LABELS } from '~/constants/eegcModes'
 
 
 /* ------------ Core State ------------ */
-const model = ref('gpt-5.2-instant')
+const model = ref('gemini-3-flash')
 const userMessage = ref('')
 const bulletPoints = ref('No bullet points extracted yet.')
 const isUpdatingDraft = ref(false)
