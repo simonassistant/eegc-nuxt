@@ -37,14 +37,10 @@
 import MarkdownIt from "markdown-it";
 import Swal from "sweetalert2";
 
-import ReportFeedback from "./report/ReportFeedback.vue";
-import ReportActions from "./report/ReportActions.vue";
-import ReportChatHistory from "./report/ReportChatHistory.vue";
 import {
   createMarkdownReport,
   downloadPDF,
   downloadMarkdownFile,
-  isValidEmail,
 } from "./report/reportUtils";
 
 const markdown = new MarkdownIt({
