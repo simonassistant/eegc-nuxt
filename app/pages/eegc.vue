@@ -3,104 +3,58 @@
   <div class="w-full p-4 flex-1 flex flex-col">
     <!-- Header -->
     <EegcCourseHeader />
-    
+
     <!-- Mode Selection -->
-    <EegcModeSelector
-      :currentMode="currentMode"
-      :isThinking="isThinking"
-      :modeLabels="MODE_LABELS"
-      :modeColors="MODE_COLORS"
-      :is-open="isModeSelectorOpen"
-      @switch-mode="switchMode"
-      @toggle-open="isModeSelectorOpen = $event"
-    />
-    
-    <div
-      class="flex-1 transition-all duration-500 ease-in-out p-4"
-      :class="isModeSelectorOpen ? 'ml-64' : 'ml-0'"
-    >
+    <EegcModeSelector :currentMode="currentMode" :isThinking="isThinking" :modeLabels="MODE_LABELS"
+      :modeColors="MODE_COLORS" :is-open="isModeSelectorOpen" @switch-mode="switchMode"
+      @toggle-open="isModeSelectorOpen = $event" />
+
+    <div class="flex-1 transition-all duration-500 ease-in-out p-4" :class="isModeSelectorOpen ? 'ml-64' : 'ml-0'">
       <!-- Briefing Mode -->
       <template v-if="currentMode === 'briefing'">
-        <EegcBriefingModeContent
-          v-model:model="model"
-          :isConnecting="isConnecting"
-          :isConnected="isConnected"
-          :notification="notification"
-          @connect="connectAPI"
-          @clear="handleClearAPI"
-        />
+        <EegcBriefingModeContent v-model:model="model" :isConnecting="isConnecting" :isConnected="isConnected"
+          :notification="notification" @connect="connectAPI" @clear="handleClearAPI" />
         <EegcBriefMode />
       </template>
 
       <!-- Training Tutorial Section -->
-      <EegcTrainingTutorialSection
-        v-if="currentMode === 'training'"
-        :isVisible="isTrainingTutorialVisible"
-        @toggle="isTrainingTutorialVisible = !isTrainingTutorialVisible"
-      />
+      <EegcTrainingTutorialSection v-if="currentMode === 'training'" :isVisible="isTrainingTutorialVisible"
+        @toggle="isTrainingTutorialVisible = !isTrainingTutorialVisible" />
 
       <!-- Background and Rubrics for Training Mode -->
-      <EegcBackgroundAndRubrics
-        v-if="currentMode === 'training'"
-        v-model:courseInfo="courseInfo"
-        v-model:currentMode="currentMode"
-        v-model:isShowArea="isTrainingBackgroundAreaVisible"
-        v-model:isSubmitted="hasSubmittedTrainingBackground"
-        @submitAll="handleSubmitRubrics"
-        @toggleArea="isTrainingBackgroundAreaVisible = $event"
-      />
+      <EegcBackgroundAndRubrics v-if="currentMode === 'training'" v-model:courseInfo="courseInfo"
+        v-model:currentMode="currentMode" v-model:isShowArea="isTrainingBackgroundAreaVisible"
+        v-model:isSubmitted="hasSubmittedTrainingBackground" @submitAll="handleSubmitRubrics"
+        @toggleArea="isTrainingBackgroundAreaVisible = $event" />
 
       <!-- Background and Rubrics for Assessment Mode -->
-      <EegcBackgroundAndRubrics
-        v-if="currentMode === 'assessment'"
-        v-model:courseInfo="courseInfoAssessment"
-        v-model:currentMode="currentMode"
-        v-model:isShowArea="isAssessmentBackgroundAreaVisible"
-        v-model:isSubmitted="hasSubmittedAssessmentBackground"
-        @submitAll="handleSubmitRubrics"
-        @toggleArea="isAssessmentBackgroundAreaVisible = $event"
-      />
+      <EegcBackgroundAndRubrics v-if="currentMode === 'assessment'" v-model:courseInfo="courseInfoAssessment"
+        v-model:currentMode="currentMode" v-model:isShowArea="isAssessmentBackgroundAreaVisible"
+        v-model:isSubmitted="hasSubmittedAssessmentBackground" @submitAll="handleSubmitRubrics"
+        @toggleArea="isAssessmentBackgroundAreaVisible = $event" />
 
       <!-- Chat Interface -->
-      <EegcChatInterface
-        v-if="
-          (currentMode === 'training' && hasSubmittedTrainingBackground) ||
-          (currentMode === 'assessment' && hasSubmittedAssessmentBackground)
-        "
-        v-model:userMessage="userMessage"
-        v-model:originalDraft="originalDraft"
-        v-model:finalDraft="finalDraft"
-        :activeChatHistory="activeChatHistory"
-        :currentMode="currentMode"
-        :isConnected="isConnected"
-        :isThinking="isThinking"
-        :isUpdatingDraft="isUpdatingDraft"
-        :isGeneratingAssessment="isGeneratingAssessment"
-        :isOriginalDraftConfirmed="isOriginalDraftConfirmed"
-        :isSubmitted="isSubmitted"
-        :bulletPoints="bulletPoints"
-        @sendMessage="sendMessage"
-        @confirmDraft="confirmDraft"
-        @submitAssessment="submitAssessment"
-        @confirmFinalDraft="confirmFinalDraft"
-        @update:currentTopic="handleTopicChange"
-      />
+      <EegcChatInterface v-if="
+        (currentMode === 'training' && hasSubmittedTrainingBackground) ||
+        (currentMode === 'assessment' && hasSubmittedAssessmentBackground)
+      " v-model:userMessage="userMessage" v-model:originalDraft="originalDraft" v-model:finalDraft="finalDraft"
+        :activeChatHistory="activeChatHistory" :currentMode="currentMode" :isConnected="isConnected"
+        :isThinking="isThinking" :isUpdatingDraft="isUpdatingDraft" :isGeneratingAssessment="isGeneratingAssessment"
+        :isOriginalDraftConfirmed="isOriginalDraftConfirmed" :isSubmitted="isSubmitted" :bulletPoints="bulletPoints"
+        @sendMessage="sendMessage" @confirmDraft="confirmDraft" @submitAssessment="submitAssessment"
+        @confirmFinalDraft="confirmFinalDraft" @update:currentTopic="handleTopicChange" />
 
       <!-- Report Modal -->
-      <EegcWritingBotReport
-        v-bind="{
-          show: showReport,
-          chatHistory: reportChatHistory,
-          reportGenerationInstructions,
-          hiddenReport,
-          bccEmail,
-          ccEmail,
-          reprotInfo,
-          mode: currentMode,
-        }"
-        @close="showReport = false"
-        @submit="isSubmitted = true"
-      />
+      <EegcWritingBotReport v-bind="{
+        show: showReport,
+        chatHistory: reportChatHistory,
+        reportGenerationInstructions,
+        hiddenReport,
+        bccEmail,
+        ccEmail,
+        reprotInfo,
+        mode: currentMode,
+      }" @close="showReport = false" @submit="isSubmitted = true" />
     </div>
   </div>
 </template>
@@ -177,7 +131,7 @@ const {
   clearChatHistory,
 } = useModeManager({ isConnected })
 
-const { sendMessage, talkToChatbot } = useChatFunctions({
+const { sendMessage: _sendMessage, talkToChatbot: _talkToChatbot } = useChatFunctions({
   userMessage,
   currentMode,
   activeChatHistory,
@@ -193,6 +147,27 @@ const { sendMessage, talkToChatbot } = useChatFunctions({
   courseInfoAssessment,
   currentTopic,
 })
+
+const talkToChatbot = async (history) => {
+  try {
+    return await _talkToChatbot(history)
+  } catch (error) {
+    if (error.statusCode === 401 || (error.message && error.message.includes('Unauthorized'))) {
+      return navigateTo('/')
+    }
+    throw error
+  }
+}
+
+const sendMessage = async () => {
+  try {
+    await _sendMessage()
+  } catch (error) {
+    if (error.statusCode === 401 || (error.message && error.message.includes('Unauthorized'))) {
+      return navigateTo('/')
+    }
+  }
+}
 
 const apiConnection = useApiConnection({
   model,

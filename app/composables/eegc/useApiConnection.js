@@ -28,6 +28,9 @@ export function useApiConnection({ model, showNotification, talkToChatbot }) {
       }
     } catch (error) {
       isConnected.value = false
+      if (error.message && error.message.includes('Unauthorized')) {
+        return navigateTo('/')
+      }
       Swal.fire({
         title: 'Connection Failed',
         text: 'The chatbot is not responding. Please check your internet connection or try again later.',

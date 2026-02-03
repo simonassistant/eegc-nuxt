@@ -26,7 +26,9 @@ export function useChatFunctions({
 
         if (!res.ok) {
             const error = await res.json();
-            throw new Error(error.statusMessage || "API request failed");
+            const err = new Error(error.statusMessage || "API request failed");
+            err.statusCode = res.status;
+            throw err;
         }
 
         const data = await res.json();
@@ -46,7 +48,9 @@ export function useChatFunctions({
 
         if (!res.ok) {
             const error = await res.json();
-            throw new Error(error.statusMessage || "API request failed");
+            const err = new Error(error.statusMessage || "API request failed");
+            err.statusCode = res.status;
+            throw err;
         }
 
         const reader = res.body.getReader();
@@ -162,11 +166,12 @@ export function useChatFunctions({
                     await extractAndUpdateEssay();
                 }
             }
-        } catch {
+        } catch (error) {
             const lastIndex = activeChatHistory.value.length - 1;
             if (lastIndex >= 0) {
                 activeChatHistory.value[lastIndex].content = "⚠️ Error connecting to server.";
             }
+            throw error;
         } finally {
             isThinking.value = false;
         }
