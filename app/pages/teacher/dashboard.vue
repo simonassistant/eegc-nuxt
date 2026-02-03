@@ -106,7 +106,6 @@ onMounted(() => {
                         <button @click="handleLogout"
                             class="flex items-center space-x-2 px-4 py-2 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all font-medium text-sm">
                             <span>Sign Out</span>
-                            <span class="text-lg">🚪</span>
                         </button>
                     </div>
                 </div>
