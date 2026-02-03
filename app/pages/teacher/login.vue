@@ -45,9 +45,9 @@ const handleLogin = async () => {
                 showConfirmButton: false
             })
 
-            // Redirect to a dashboard or a generic eegc page
+            // Redirect to a dashboard
             setTimeout(() => {
-                navigateTo('/eegc')
+                navigateTo('/teacher/dashboard')
             }, 1500)
         }
     } catch (error: any) {
