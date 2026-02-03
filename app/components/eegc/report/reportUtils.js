@@ -142,60 +142,43 @@ export async function downloadPDF(history, contributionAnalysis) {
 
     const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
-    // --- PDF 参数设置 ---
-    const doc = new jsPDF("p", "mm", "a4");
-    const a4Width = 210;
-    const a4Height = 297;
+    // --- 创建单页长 PDF (不切割内容) ---
+    const a4Width = 210; // A4 宽度 (mm)
 
-    // 1. 设置边距 (单位: mm)
-    const verticalPadding = 15; // 顶部和底部的留白高度
-    const horizontalPadding = 10; // 左右留白宽度
+    // 设置边距 (单位: mm)
+    const verticalPadding = 20; // 顶部和底部的留白高度
+    const horizontalPadding = 15; // 左右留白宽度
 
-    // 2. 计算内容实际可用的宽度和高度
+    // 计算内容区域宽度
     const contentWidth = a4Width - (horizontalPadding * 2);
-    const contentHeightPerPage = a4Height - (verticalPadding * 2);
 
-    // 3. 根据内容宽度比例缩放图片高度
+    // 根据宽度计算图片的缩放高度
     const imgWidthPx = canvas.width;
     const imgHeightPx = canvas.height;
     const ratio = contentWidth / imgWidthPx;
-    const scaledImgHeight = imgHeightPx * ratio; // 图片缩放后的总高度
+    const scaledImgHeight = imgHeightPx * ratio; // 图片缩放后的总高度 (mm)
 
-    let heightLeft = scaledImgHeight; // 剩余未绘制的高度
-    let currYPos = 0; // 当前截取图片的起始 Y 坐标 (相对于图片本身)
-    let isFirstPage = true;
+    // 计算整个页面的高度 (图片高度 + 上下边距)
+    const totalPageHeight = scaledImgHeight + (verticalPadding * 2);
 
-    // 4. 循环分页绘制
-    while (heightLeft > 0) {
-      if (!isFirstPage) {
-        doc.addPage();
-      }
+    // 创建自定义高度的 PDF 页面
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [a4Width, totalPageHeight] // 宽度固定为 A4，高度动态调整
+    });
 
-      /**
-       * doc.addImage 参数详解:
-       * imgData: 图片数据
-       * 'JPEG': 格式
-       * horizontalPadding: 在 PDF 页面上的横坐标 (x)
-       * verticalPadding - currYPos: 在 PDF 页面上的纵坐标 (y)
-       * contentWidth: 图片在 PDF 里的显示宽度
-       * scaledImgHeight: 图片在 PDF 里的显示总高度
-       */
-      doc.addImage(
-        imgData,
-        "JPEG",
-        horizontalPadding,
-        verticalPadding - currYPos,
-        contentWidth,
-        scaledImgHeight,
-        undefined,
-        'FAST' // 优化性能
-      );
-
-      // 每次移动“一页有效内容”的高度
-      currYPos += contentHeightPerPage;
-      heightLeft -= contentHeightPerPage;
-      isFirstPage = false;
-    }
+    // 在页面上绘制图片 (带边距)
+    doc.addImage(
+      imgData,
+      "JPEG",
+      horizontalPadding,      // x: 左边距
+      verticalPadding,        // y: 顶部边距
+      contentWidth,           // 图片宽度
+      scaledImgHeight,        // 图片高度
+      undefined,
+      "FAST"
+    );
 
     doc.save(`HKBU_Learning_Report_${new Date().toISOString().split("T")[0]}.pdf`);
 
