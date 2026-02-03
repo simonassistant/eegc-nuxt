@@ -119,7 +119,7 @@ const contributionContent = computed(() => {
                             <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest">Contribution Analysis
                             </h3>
                         </div>
-                        <div class="prose prose-indigo max-w-none bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-700"
+                        <div class="prose prose-indigo max-w-none bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-700 [&_pre]:whitespace-pre-wrap [&_code]:whitespace-pre-wrap [&_ol]:list-decimal [&_ul]:list-disc"
                             v-html="contributionContent">
                         </div>
                     </div>
@@ -146,7 +146,7 @@ const contributionContent = computed(() => {
                                         :class="msg.role === 'user' ? 'text-indigo-100' : 'text-slate-400'">
                                         {{ msg.role === 'user' ? 'Student' : 'AI Assistant' }}
                                     </div>
-                                    <div class="prose prose-sm max-w-none break-words"
+                                    <div class="prose prose-sm max-w-none break-words [&_pre]:whitespace-pre-wrap [&_code]:whitespace-pre-wrap [&_ol]:list-decimal [&_ul]:list-disc"
                                         :class="msg.role === 'user' ? 'text-white prose-invert' : 'text-slate-700'"
                                         v-html="renderMarkdown(msg.content)">
                                     </div>
